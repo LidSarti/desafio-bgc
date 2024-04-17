@@ -1,0 +1,13 @@
+service: desafio-bgc
+
+frameworkVersion: "3"
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: sa-east-1
+  memorySize: 256
+
+functions:
+  scraping:
+    handler: scraping.handle

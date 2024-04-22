@@ -10,4 +10,4 @@ provider:
 
 functions:
   scraping:
-    handler: scraping.handle
+    handler: scraping.handler

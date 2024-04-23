@@ -11,3 +11,10 @@ provider:
 functions:
   scraping:
     handler: scraping.handler
+    events: 
+      - http: 
+          path: /
+          method: get
+
+plugins:
+  - serverless-plugin-typescript

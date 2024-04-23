@@ -1,11 +1,17 @@
 const chromium = require("@sparticuz/chromium");
-const puppeteer = require("puppeteer-core");
-const { DynamoDBDocumentClient, PutCommand, BatchWriteCommand } = require("@aws-sdk/lib-dynamodb");
+const { DynamoDBDocumentClient, BatchWriteCommand } = require("@aws-sdk/lib-dynamodb");
 const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
-const Responses = require('./api-responses');
+import Responses from './api-responses';
 
-module.exports.handler = async () => {
-    let browser = null;
+import * as puppeteer from "puppeteer-core";
+
+interface Product {
+    name: string;
+    price: string;
+}
+
+export const handler = async (): Promise<any> => {
+    let browser: puppeteer.Browser | null = null;
 
     try {
         browser = await puppeteer.launch({
@@ -20,12 +26,12 @@ module.exports.handler = async () => {
         
         const productElements = await page.$$('.promotion-item');
         
-        const productsPromises = productElements.slice(0, 3).map(async (product, index) => {
+        const productsPromises: Promise<Product>[] = productElements.slice(0, 3).map(async (product, index) => {
             const nameElement = await product.$('.promotion-item__title');
-            const name = nameElement ? await nameElement.evaluate(element => element.textContent.trim()) : 'Title not found';
+            const name = nameElement ? await nameElement.evaluate(element => element.textContent?.trim() || 'Title not found') : 'Title not found';
 
             const priceElement = await product.$('.promotion-item__price');
-            let price = priceElement ? await priceElement.evaluate(element => element.textContent.trim()) : 'Price not found';
+            let price = priceElement ? await priceElement.evaluate(element => element.textContent?.trim() || 'Price not found') : 'Price not found';
 
             const prices = price.split('R$');
             price = `R$${prices[1]}`;
@@ -42,14 +48,13 @@ module.exports.handler = async () => {
     } catch (error) {
         return Responses._500({ message: `Failed to fetch products from Mercado Livre ${error}`});
     } finally {
-        if(browser != null)
-        {
+        if(browser !== null) {
             await browser.close();
         }
     }
 };
 
-async function insertProductsIntoDynamoDB(products) {
+async function insertProductsIntoDynamoDB(products: Product[]): Promise<void> {
     const client = new DynamoDBClient({});
     const docClient = new DynamoDBDocumentClient(client);
 
@@ -81,8 +86,8 @@ async function insertProductsIntoDynamoDB(products) {
     }
 }
 
-function chunkArray(array, size) {
-    const chunkedArray = [];
+function chunkArray<T>(array: T[], size: number): T[][] {
+    const chunkedArray: T[][] = [];
     for (let i = 0; i < array.length; i += size) {
         chunkedArray.push(array.slice(i, i + size));
     }

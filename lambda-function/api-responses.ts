@@ -1,5 +1,17 @@
+interface ResponseData {
+    [key: string]: any;
+}
+
+export interface Response {
+    headers: {
+        [key: string]: string;
+    };
+    statusCode: number;
+    body: string;
+}
+
 const Responses = {
-    _200(data = {}) {
+    _200(data: ResponseData = {}): Response {
         return {
             headers: {
                 'Content-Type': 'application/json',
@@ -11,7 +23,7 @@ const Responses = {
         };
     },
 
-    _500(data = {}) {
+    _500(data: ResponseData = {}): Response {
         return {
             headers: {
                 'Content-Type': 'application/json',
@@ -24,4 +36,4 @@ const Responses = {
     },
 };
 
-module.exports = Responses;
+export default Responses;

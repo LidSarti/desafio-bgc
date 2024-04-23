@@ -6,7 +6,7 @@ provider:
   name: aws
   runtime: nodejs18.x
   region: sa-east-1
-  memorySize: 256
+  memorySize: 512
 
 functions:
   scraping:

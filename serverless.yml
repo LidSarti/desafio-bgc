@@ -10,7 +10,7 @@ provider:
 
 functions:
   scraping:
-    handler: scraping.handler
+    handler: srv/scraping.handler
     events: 
       - http: 
           path: /
